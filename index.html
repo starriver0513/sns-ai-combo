@@ -186,8 +186,8 @@ img{max-width:100%;height:auto;display:block}
   box-shadow:0 16px 38px rgba(4,20,54,.32);overflow:hidden}
 .prompt-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 16px;
   background:rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.09)}
-.prompt-head b{color:#cfe4ff;font-size:12.5px;font-weight:800;letter-spacing:.04em}
-.copy{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border:0;border-radius:9px;cursor:pointer;
+.prompt-head b{color:#cfe4ff;font-size:12.5px;font-weight:800;letter-spacing:.04em;min-width:0}
+.copy{flex-shrink:0;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border:0;border-radius:9px;cursor:pointer;
   background:var(--blue);color:#fff;font-size:12px;font-weight:800;font-family:inherit;transition:background .2s ease,transform .2s ease}
 .copy:hover{transform:translateY(-1px)}
 .copy.done{background:var(--ok)}
@@ -973,10 +973,11 @@ X投稿の企画を5本出してください。
     var io = new IntersectionObserver(function(es){
       es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
     }, {rootMargin:'0px 0px -12% 0px', threshold:0});  /* threshold>0だと、ビューポートの十数倍の高さの要素（長文プロンプトのカード等）で一生発火せず透明のまま章が消える（2026-08-20 No.12で実発生: 19,267pxのカードは最大でも3.7%しか見えない） */
-    rv.forEach(function(el){ io.observe(el); });
+    rv.forEach(function(el){ if (el.offsetHeight > window.innerHeight) { el.classList.add('in'); } else { io.observe(el); } });  /* 画面より高い要素はアニメさせない（2026-10-11 追加） */
   } else {
     rv.forEach(function(el){ el.classList.add('in'); });
   }
+  setTimeout(function(){ rv.forEach(function(el){ el.classList.add('in'); }); }, 2500);  /* 最後の砦: 発火しなかった章も2.5秒後に表示（2026-10-11 追加） */
 
   /* [C:目次] + [C:サイド進捗ナビ] 現在地ハイライト */
   var secs = Array.prototype.slice.call(document.querySelectorAll('section.sec[id]'));
